@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -7,24 +8,25 @@ class Program
 {
     static void Main()
     {
-        try
+        Console.WriteLine("Expense Tracker - enter a command or 'exit' to quit: ");
+        do
         {
-            Console.WriteLine("Welcome to your expense tracker app! Please enter a command to start: ");
-            do
+            string? userInput = Console.ReadLine()?.ToLower().Trim();
+
+            if (string.IsNullOrWhiteSpace(userInput))
             {
-                string? userInput = Console.ReadLine()?.ToLower().Trim();
+                Console.WriteLine("Please enter a command: ");
+                continue;
+            }
 
-                if (string.IsNullOrWhiteSpace(userInput))
-                {
-                    Console.WriteLine("Please enter a command:");
-                    continue;
-                }
+            if (userInput == "exit")
+            {
+                break;
+            }
 
-                if (userInput == "exit")
-                {
-                    break;
-                }
-                else if (userInput.StartsWith("add", StringComparison.OrdinalIgnoreCase))
+            try
+            {
+                if (userInput.StartsWith("add", StringComparison.OrdinalIgnoreCase))
                 {
                     Expense newExpense = CommandParser.ParseAddCommand(userInput);
                     ExpensesService.AddExpense(newExpense);
@@ -42,20 +44,25 @@ class Program
                     Console.WriteLine("Invalid command. Please try again:");
                     continue;
                 }
-            } while (true);
-        }
-        catch (JsonException ex)
-        {
-            Console.WriteLine($"JSON error: {ex.Message}");
-        }
-        catch (IOException ex)
-        {
-            Console.WriteLine($"File read error: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Unexpected error: {ex.Message}");
-        }
+            }
+            catch (JsonException ex)
+            {
+                Console.WriteLine($"JSON error: {ex.Message}");
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"File read error: {ex.Message}");
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine($"Input error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error: {ex.Message}");
+            }
+        } while (true);
+
     }
 }
 public class Expense
@@ -69,7 +76,9 @@ public class Expense
 
 public static class ExpensesService
 {
-    static string filePath = Path.Combine(AppContext.BaseDirectory, "expenses.json");
+    // TO DO: Remove debug option before release
+    static bool isDebug = Debugger.IsAttached;
+    static string filePath = isDebug ? Path.Combine(AppContext.BaseDirectory, "expenses.json") : "expenses.json";
     static List<Expense> expenses = new List<Expense>();
     static int id = 1;
 
@@ -123,6 +132,17 @@ public static class CommandParser
         // Set the other required properties before adding to the expense list
         return new Expense { Description = description, Amount = amount };
     }
+
+    /*
+    * Splits a command-line-style input string into an array of arguments.
+    *
+    * - Arguments are separated by whitespace
+    * - Quoted substrings (enclosed in double quotes) are treated as single arguments.
+    * 
+    * Example:
+    * Input: add --description "Lunch with coworkers" --amount 20
+    * Output: ["add", "--description", "lunch with coworkers", "--amount", "20"]
+    */
     public static string[] SplitCommandLine(string input)
     {
         var args = new List<string>();
