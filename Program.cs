@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -34,11 +35,11 @@ class Program
                 else if (userInput == "list")
                 {
                     List<Expense> existingExpenses = ExpensesService.ListExpenses();
-                    Console.WriteLine($"{"ID", -5} {"Date", -12} {"Description", -30} {"Amount", 10}");
+                    Console.WriteLine($"{"ID",-5} {"Date",-12} {"Description",-30} {"Amount",10}");
                     Console.WriteLine(new string('-', 65));
                     foreach (Expense expense in existingExpenses)
                     {
-                        Console.WriteLine($"{expense.Id, -5} {expense.Date, -12} {expense.Description, -30} {expense.Amount, 10}");
+                        Console.WriteLine($"{expense.Id,-5} {expense.Date,-12} {expense.Description,-30} {expense.Amount.ToString("C", CultureInfo.CurrentCulture),10}");
                     }
                 }
                 else if (userInput.StartsWith("delete", StringComparison.OrdinalIgnoreCase))
@@ -47,7 +48,15 @@ class Program
                 }
                 else if (userInput.StartsWith("summary", StringComparison.OrdinalIgnoreCase))
                 {
+                    List<Expense> existingExpenses = ExpensesService.ListExpenses();
+                    int totalAmount = 0;
 
+                    foreach (Expense expense in existingExpenses)
+                    {
+                        totalAmount += expense.Amount;
+                    }
+
+                    Console.WriteLine($"Total expenses: {totalAmount.ToString("C", CultureInfo.CurrentCulture)}");
                 }
                 else
                 {
