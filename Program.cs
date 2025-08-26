@@ -1,7 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Text;
 using System.Text.Json;
 
@@ -39,12 +37,13 @@ class Program
                     Console.WriteLine(new string('-', 65));
                     foreach (Expense expense in existingExpenses)
                     {
-                        Console.WriteLine($"{expense.Id,-5} {expense.Date,-12} {expense.Description,-30} {expense.Amount.ToString("C", CultureInfo.CurrentCulture),10}");
+                        Console.WriteLine($"{expense.Id,-5} {expense.Date.ToString("d"),-12} {expense.Description,-30} {expense.Amount.ToString("C", CultureInfo.CurrentCulture),10}");
                     }
                 }
                 else if (userInput.StartsWith("delete", StringComparison.OrdinalIgnoreCase))
                 {
-
+                    int id = CommandParser.ParseDeleteCommand(userInput);
+                    ExpensesService.DeleteExpense(id);
                 }
                 else if (userInput.StartsWith("summary", StringComparison.OrdinalIgnoreCase))
                 {
@@ -87,8 +86,8 @@ class Program
 public class Expense
 {
     public int Id { get; set; }
-    public string Date { get; set; }
-    public string Description { get; set; }
+    public DateTime Date { get; set; }
+    public string Description { get; set; } = "";
     public int Amount { get; set; }
     // public string Category { get; set; }
 }
@@ -104,7 +103,7 @@ public static class ExpensesService
     public static int AddExpense(Expense expense)
     {
         expense.Id = id++;
-        expense.Date = DateTime.Now.ToString("d");
+        expense.Date = DateTime.Now;
         expenses.Add(expense);
         SaveExpensesToFile();
         Console.WriteLine($"Expense added successfully ID: {expense.Id}");
@@ -122,6 +121,21 @@ public static class ExpensesService
         string json = File.ReadAllText(filePath);
         expenses = JsonSerializer.Deserialize<List<Expense>>(json) ?? new List<Expense>();
         return expenses;
+    }
+
+    public static Expense? Get(int id) => expenses.FirstOrDefault(expense => expense.Id == id);
+
+    public static void DeleteExpense(int id)
+    {
+        var expense = Get(id);
+        if (expense is null)
+        {
+            return;
+        }
+
+        expenses.Remove(expense);
+        SaveExpensesToFile();
+        Console.WriteLine("Expense deleted successfully");
     }
 
     static void SaveExpensesToFile()
@@ -163,6 +177,21 @@ public static class CommandParser
         // Note that only the description and amount are set here
         // Set the other required properties before adding to the expense list
         return new Expense { Description = description, Amount = amount };
+    }
+
+    public static int ParseDeleteCommand(string input)
+    {
+        var args = SplitCommandLine(input);
+        var idIndex = Array.IndexOf(args, "--id");
+
+        if (idIndex == -1)
+        {
+            throw new ArgumentException("Missing required argument.");
+        }
+
+        int id = int.Parse(args[idIndex + 1]);
+
+        return id;
     }
 
     /*
