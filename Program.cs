@@ -31,6 +31,16 @@ class Program
                     Expense newExpense = CommandParser.ParseAddCommand(userInput);
                     ExpensesService.AddExpense(newExpense);
                 }
+                else if (userInput == "list")
+                {
+                    List<Expense> existingExpenses = ExpensesService.ListExpenses();
+                    Console.WriteLine($"{"ID", -5} {"Date", -12} {"Description", -30} {"Amount", 10}");
+                    Console.WriteLine(new string('-', 65));
+                    foreach (Expense expense in existingExpenses)
+                    {
+                        Console.WriteLine($"{expense.Id, -5} {expense.Date, -12} {expense.Description, -30} {expense.Amount, 10}");
+                    }
+                }
                 else if (userInput.StartsWith("delete", StringComparison.OrdinalIgnoreCase))
                 {
 
@@ -92,6 +102,19 @@ public static class ExpensesService
         return expense.Id;
     }
 
+    public static List<Expense> ListExpenses()
+    {
+        if (!File.Exists(filePath))
+        {
+            Console.WriteLine($"File not found: {filePath}");
+            return new List<Expense>();
+        }
+
+        string json = File.ReadAllText(filePath);
+        expenses = JsonSerializer.Deserialize<List<Expense>>(json) ?? new List<Expense>();
+        return expenses;
+    }
+
     static void SaveExpensesToFile()
     {
         string updatedJson = JsonSerializer.Serialize(expenses, new JsonSerializerOptions { WriteIndented = true });
@@ -122,7 +145,7 @@ public static class CommandParser
 
         if (descriptionIndex == -1 || amountIndex == -1)
         {
-            throw new ArgumentException("Missing required arguments");
+            throw new ArgumentException("Missing required arguments.");
         }
 
         string description = args[descriptionIndex + 1];
