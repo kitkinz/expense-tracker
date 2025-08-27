@@ -1,6 +1,26 @@
 # Expense Tracker Console Application
 Project task URL: https://roadmap.sh/projects/expense-tracker <br />
 
+## Installation
+Follow these steps to run this application:
+1. Clone this repository:
+```
+git clone https://github.com/kitkinz/expense-tracker.git
+```
+2. Navigate to the project directory:
+```
+cd ExpenseTracker
+```
+3. Restore dependencies:
+```
+dotnet restore
+```
+4. Build then run the project:
+```
+dotnet build
+dotnet run
+```
+
 ## Features
 - Users can add an expense with a description and amount.
 - Users can update an expense.
