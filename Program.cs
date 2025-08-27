@@ -47,15 +47,7 @@ class Program
                 }
                 else if (userInput.StartsWith("summary", StringComparison.OrdinalIgnoreCase))
                 {
-                    List<Expense> existingExpenses = ExpensesService.ListExpenses();
-                    int totalAmount = 0;
-
-                    foreach (Expense expense in existingExpenses)
-                    {
-                        totalAmount += expense.Amount;
-                    }
-
-                    Console.WriteLine($"Total expenses: {totalAmount.ToString("C", CultureInfo.CurrentCulture)}");
+                    ExpensesService.SummaryExpenses(userInput);
                 }
                 else
                 {
@@ -121,6 +113,43 @@ public static class ExpensesService
         string json = File.ReadAllText(filePath);
         expenses = JsonSerializer.Deserialize<List<Expense>>(json) ?? new List<Expense>();
         return expenses;
+    }
+
+    public static void SummaryExpenses(string input)
+    {
+        var args = CommandParser.SplitCommandLine(input);
+        var monthIndex = Array.IndexOf(args, "--month");
+        List<Expense> expenses = ExpensesService.ListExpenses();
+        int totalAmount = 0;
+
+        // Overall summary
+        if (args.Length == 1)
+        {
+            foreach (Expense expense in expenses)
+            {
+                totalAmount += expense.Amount;
+            }
+
+            Console.WriteLine($"Total expenses: {totalAmount.ToString("C", CultureInfo.CurrentCulture)}");
+        }
+        else
+        {
+            if (monthIndex == -1)
+            {
+                throw new ArgumentException("Missing required argument.");
+            }
+
+            int month = int.Parse(args[monthIndex + 1]);
+            string monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month);
+            foreach (Expense expense in expenses)
+            {
+                if (expense.Date.Month == month)
+                {
+                    totalAmount += expense.Amount;
+                }
+            }
+            Console.WriteLine($"Total expenses for {monthName}: {totalAmount.ToString("C", CultureInfo.CurrentCulture)}");
+        }
     }
 
     public static Expense? Get(int id) => expenses.FirstOrDefault(expense => expense.Id == id);
