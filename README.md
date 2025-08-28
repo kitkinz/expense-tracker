@@ -1,5 +1,18 @@
 # Expense Tracker Console Application
-Project task URL: https://roadmap.sh/projects/expense-tracker <br />
+
+A simple C# console app to track your expenses from the terminal.
+
+[Project Task on Roadmap.sh](https://roadmap.sh/projects/expense-tracker)
+
+---
+
+## Features
+- Add an expense with a description and amount
+- Update existing expenses
+- Delete expenses by ID
+- List all recorded expenses
+- View total expense summary
+- View summary for a specific month (current year)
 
 ## Installation
 Follow these steps to run this application:
@@ -21,15 +34,17 @@ dotnet build
 dotnet run
 ```
 
-## Features
-- Users can add an expense with a description and amount.
-- Users can update an expense.
-- Users can delete an expense.
-- Users can view all expenses.
-- Users can view a summary of all expenses.
-- Users can view a summary of expenses for a specific month (of current year).
+## Usage
+### Commands
+- `help`: Show available commands
+- `add --description "..." --amount 30`: Add a new expense
+- `list`: Lists all expenses
+- `delete --id 1`: Delete expense by ID
+- `summary`: Show total expenses
+- `summary --month 8`: Show total for a specific month (e.g., 8 = August)
+- `exit`: Exit the app
 
-## List of commands
+### Example
 ```
 $ expense-tracker add --description "Lunch" --amount 20
 # Expense added successfully (ID: 1)
