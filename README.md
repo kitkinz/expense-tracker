@@ -4,8 +4,6 @@ A simple C# console app to track your expenses from the terminal.
 
 [Project Task on Roadmap.sh](https://roadmap.sh/projects/expense-tracker)
 
----
-
 ## Features
 - Add an expense with a description and amount
 - Update existing expenses
