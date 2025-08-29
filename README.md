@@ -40,6 +40,7 @@ dotnet run
 - `delete --id 1`: Delete expense by ID
 - `summary`: Show total expenses
 - `summary --month 8`: Show total for a specific month (e.g., 8 = August)
+- `clear`: Clears the console
 - `exit`: Exit the app
 
 ### Example

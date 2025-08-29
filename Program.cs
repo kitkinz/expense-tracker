@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        Console.WriteLine("Expense Tracker - enter a command or 'exit' to quit: ");
+        Console.WriteLine("Expense Tracker - enter a command or \"help\" to list the available commands or \"exit\" to quit: ");
         do
         {
             string? userInput = Console.ReadLine()?.ToLower().Trim();
@@ -48,6 +48,23 @@ class Program
                 else if (userInput.StartsWith("summary", StringComparison.OrdinalIgnoreCase))
                 {
                     ExpensesService.SummaryExpenses(userInput);
+                }
+                else if (userInput == "clear")
+                {
+                    Console.Clear();
+                    Console.WriteLine("Expense Tracker - enter a command or \"help\" to list the available commands or \"exit\" to quit: ");
+                }
+                else if (userInput == "help")
+                {
+                    Console.WriteLine("Here are the available commands:");
+                    Console.WriteLine("help: Show available commands");
+                    Console.WriteLine("add --description \"...\" --amount 30: Add a new expense");
+                    Console.WriteLine("list: Lists all expenses");
+                    Console.WriteLine("delete --id 1: Delete expense by ID");
+                    Console.WriteLine("summary: Show total expenses");
+                    Console.WriteLine("summary --month 8: Show total for a specific month (e.g., 8 = August)");
+                    Console.WriteLine("clear: Clears the console");
+                    Console.WriteLine("exit: Exit the app");
                 }
                 else
                 {
